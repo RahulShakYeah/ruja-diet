@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Complete Health Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#07090b;--card:#111518;--card2:#161c20;--border:#1e272d;
+  --muted:#38484f;--text:#b0c4cd;--bright:#deedf5;--dim:#4a5e68;
+  --run:#f97316;--run-d:rgba(249,115,22,0.12);
+  --push:#3b82f6;--push-d:rgba(59,130,246,0.10);
+  --pull:#a78bfa;--pull-d:rgba(167,139,250,0.10);
+  --legs:#34d399;--legs-d:rgba(52,211,153,0.10);
+  --gym:#fbbf24;--gym-d:rgba(251,191,36,0.10);
+  --sage:#6aaa7a;--sage-d:rgba(106,170,122,0.10);
+  --water:#38bdf8;--water-d:rgba(56,189,248,0.10);
+  --rest:#64748b;--rest-d:rgba(100,116,139,0.08);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;}
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 900px 500px at 8% 5%,rgba(249,115,22,0.05) 0%,transparent 60%),
+    radial-gradient(ellipse 700px 600px at 92% 92%,rgba(59,130,246,0.04) 0%,transparent 60%),
+    radial-gradient(ellipse 500px 400px at 50% 50%,rgba(106,170,122,0.02) 0%,transparent 60%);
+}
+.wrap{position:relative;z-index:1;max-width:1000px;margin:0 auto;padding:0 18px 80px;}
+
+/* NAV TABS */
+.nav{
+  position:sticky;top:0;z-index:100;
+  background:rgba(7,9,11,0.92);backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+  display:flex;gap:0;overflow-x:auto;
+  scrollbar-width:none;
+}
+.nav::-webkit-scrollbar{display:none;}
+.nav-tab{
+  font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;
+  text-transform:uppercase;padding:16px 20px;color:var(--muted);
+  cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;
+  transition:color 0.2s,border-color 0.2s;user-select:none;
+}
+.nav-tab:hover{color:var(--text);}
+.nav-tab.active{color:var(--run);border-bottom-color:var(--run);}
+
+/* PANELS */
+.panel{display:none;}
+.panel.active{display:block;}
+
+/* HERO */
+.hero{padding:52px 0 34px;border-bottom:1px solid var(--border);margin-bottom:36px;}
+.eyebrow{
+  font-family:'DM Mono',monospace;font-size:10px;letter-spacing:3px;
+  color:var(--run);text-transform:uppercase;margin-bottom:12px;
+  display:flex;align-items:center;gap:10px;
+}
+.eyebrow::before{content:'';width:26px;height:1px;background:var(--run);}
+.hero h1{font-size:clamp(32px,5vw,58px);font-weight:800;line-height:1.02;color:var(--bright);letter-spacing:-2px;margin-bottom:8px;}
+.hero h1 em{font-family:'Instrument Serif',serif;font-style:italic;color:var(--run);font-weight:400;}
+.hero-sub{font-size:13px;color:var(--dim);margin-bottom:26px;}
+.hstats{display:flex;flex-wrap:wrap;gap:8px;}
+.hs{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:11px 16px;}
+.hs-v{font-size:16px;font-weight:700;color:var(--bright);letter-spacing:-0.5px;}
+.hs-k{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-top:2px;}
+
+/* SECTION LABEL */
+.slabel{
+  font-family:'DM Mono',monospace;font-size:9.5px;letter-spacing:3px;
+  text-transform:uppercase;color:var(--muted);margin-bottom:13px;
+  display:flex;align-items:center;gap:12px;
+}
+.slabel::after{content:'';flex:1;height:1px;background:var(--border);}
+.sh2{font-size:clamp(18px,2.5vw,25px);font-weight:700;color:var(--bright);letter-spacing:-0.8px;margin-bottom:4px;}
+.sdesc{font-size:12px;color:var(--dim);margin-bottom:20px;}
+
+/* BANNER */
+.banner{
+  background:var(--card);border:1px solid var(--border);
+  border-left:3px solid var(--run);border-radius:0 12px 12px 0;
+  padding:16px 22px;margin-bottom:36px;
+  display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:start;
+}
+.bico{font-size:22px;padding-top:1px;}
+.banner h3{font-size:13px;font-weight:700;color:var(--bright);margin-bottom:6px;}
+.banner p{font-size:12px;line-height:1.78;color:var(--text);}
+.banner strong{color:var(--run);}
+.btag{display:inline-block;background:var(--run-d);color:var(--run);font-family:'DM Mono',monospace;font-size:9px;padding:2px 8px;border-radius:3px;margin:5px 3px 0 0;letter-spacing:1px;}
+
+/* LEGEND */
+.legend{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:18px;}
+.leg{display:flex;align-items:center;gap:5px;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;color:var(--muted);}
+.ldot{width:8px;height:8px;border-radius:2px;}
+
+/* WEEK GRID */
+.wgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:7px;margin-bottom:40px;}
+.dc{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:13px;padding:13px 10px;
+  transition:transform 0.18s;cursor:default;
+}
+.dc:hover{transform:translateY(-3px);}
+.dname{font-family:'DM Mono',monospace;font-size:8.5px;letter-spacing:2px;text-transform:uppercase;margin-bottom:7px;}
+.dbadge{font-size:7.5px;font-family:'DM Mono',monospace;letter-spacing:1px;text-transform:uppercase;padding:2px 6px;border-radius:3px;margin-bottom:8px;display:inline-block;}
+.dtime{font-family:'DM Mono',monospace;font-size:8.5px;color:var(--muted);margin-bottom:5px;margin-top:4px;}
+.di{display:flex;align-items:flex-start;gap:5px;font-size:10px;color:var(--text);margin-bottom:5px;line-height:1.4;}
+.ddot{width:5px;height:5px;border-radius:50%;flex-shrink:0;margin-top:3.5px;}
+.dtag{font-family:'DM Mono',monospace;font-size:7.5px;color:var(--muted);border:1px solid var(--border);border-radius:3px;padding:2px 5px;margin-top:5px;display:inline-block;}
+
+/* day colour variants */
+.c-run{border-color:rgba(249,115,22,0.28);background:linear-gradient(155deg,rgba(249,115,22,0.07) 0%,var(--card) 55%);}
+.c-run .dname,.c-run .dtime{color:var(--run);}
+.c-run .dbadge{background:var(--run-d);color:var(--run);}
+.c-run .ddot{background:var(--run);}
+.c-push{border-color:rgba(59,130,246,0.28);background:linear-gradient(155deg,rgba(59,130,246,0.07) 0%,var(--card) 55%);}
+.c-push .dname,.c-push .dtime{color:var(--push);}
+.c-push .dbadge{background:var(--push-d);color:var(--push);}
+.c-push .ddot{background:var(--push);}
+.c-pull{border-color:rgba(167,139,250,0.28);background:linear-gradient(155deg,rgba(167,139,250,0.07) 0%,var(--card) 55%);}
+.c-pull .dname,.c-pull .dtime{color:var(--pull);}
+.c-pull .dbadge{background:var(--pull-d);color:var(--pull);}
+.c-pull .ddot{background:var(--pull);}
+.c-legs{border-color:rgba(52,211,153,0.28);background:linear-gradient(155deg,rgba(52,211,153,0.07) 0%,var(--card) 55%);}
+.c-legs .dname,.c-legs .dtime{color:var(--legs);}
+.c-legs .dbadge{background:var(--legs-d);color:var(--legs);}
+.c-legs .ddot{background:var(--legs);}
+.c-gym{border-color:rgba(251,191,36,0.28);background:linear-gradient(155deg,rgba(251,191,36,0.07) 0%,var(--card) 55%);}
+.c-gym .dname,.c-gym .dtime{color:var(--gym);}
+.c-gym .dbadge{background:var(--gym-d);color:var(--gym);}
+.c-gym .ddot{background:var(--gym);}
+.c-rest{border-color:rgba(100,116,139,0.18);}
+.c-rest .dname,.c-rest .dtime{color:var(--rest);}
+.c-rest .dbadge{background:var(--rest-d);color:var(--rest);}
+.c-rest .ddot{background:var(--rest);}
+
+/* PPL CARDS */
+.ppl-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:40px;}
+.ppl-card{background:var(--card);border:1px solid var(--border);border-radius:15px;overflow:hidden;}
+.ppl-head{padding:15px 18px 13px;display:flex;justify-content:space-between;align-items:flex-end;}
+.ppl-big{font-size:38px;font-weight:800;letter-spacing:-3px;line-height:1;}
+.ppl-name{font-family:'DM Mono',monospace;font-size:8.5px;letter-spacing:2px;text-transform:uppercase;margin-top:3px;}
+.ppl-day{font-family:'DM Mono',monospace;font-size:10px;text-align:right;line-height:1.6;}
+.ppl-body{padding:0 18px 18px;}
+.ex{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:11.5px;}
+.ex:last-child{border-bottom:none;}
+.ex-n{color:var(--bright);font-weight:600;font-size:11.5px;}
+.ex-m{font-size:9.5px;color:var(--muted);}
+.ex-s{font-family:'DM Mono',monospace;font-size:9.5px;padding:2px 8px;border-radius:3px;white-space:nowrap;}
+.push-head{background:linear-gradient(135deg,rgba(59,130,246,0.13),rgba(59,130,246,0.04));border-bottom:1px solid rgba(59,130,246,0.18);}
+.push-head .ppl-big{color:var(--push);}
+.push-head .ppl-name,.push-head .ppl-day{color:rgba(59,130,246,0.6);}
+.push-s{background:var(--push-d);color:var(--push);}
+.pull-head{background:linear-gradient(135deg,rgba(167,139,250,0.13),rgba(167,139,250,0.04));border-bottom:1px solid rgba(167,139,250,0.18);}
+.pull-head .ppl-big{color:var(--pull);}
+.pull-head .ppl-name,.pull-head .ppl-day{color:rgba(167,139,250,0.6);}
+.pull-s{background:var(--pull-d);color:var(--pull);}
+.legs-head{background:linear-gradient(135deg,rgba(52,211,153,0.13),rgba(52,211,153,0.04));border-bottom:1px solid rgba(52,211,153,0.18);}
+.legs-head .ppl-big{color:var(--legs);}
+.legs-head .ppl-name,.legs-head .ppl-day{color:rgba(52,211,153,0.6);}
+.legs-s{background:var(--legs-d);color:var(--legs);}
+
+/* 5K ACCORDION */
+.run-weeks{display:flex;flex-direction:column;gap:8px;margin-bottom:40px;}
+.rw{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.rw-head{
+  display:grid;grid-template-columns:110px 1fr auto auto;
+  align-items:center;padding:13px 18px;gap:14px;
+  cursor:pointer;transition:background 0.15s;
+}
+.rw-head:hover{background:rgba(249,115,22,0.04);}
+.rw-wk{font-family:'DM Mono',monospace;font-size:9.5px;letter-spacing:2px;text-transform:uppercase;color:var(--run);}
+.rw-dates{font-family:'DM Mono',monospace;font-size:9.5px;color:var(--muted);}
+.rw-title{font-size:12.5px;font-weight:700;color:var(--bright);}
+.rw-badge{font-family:'DM Mono',monospace;font-size:8.5px;padding:3px 9px;background:var(--run-d);color:var(--run);border-radius:3px;white-space:nowrap;letter-spacing:1px;}
+.chevron{font-size:10px;color:var(--muted);transition:transform 0.2s;margin-left:8px;}
+.rw.open .chevron{transform:rotate(180deg);}
+.rw-body{display:none;padding:14px 18px;border-top:1px solid var(--border);grid-template-columns:repeat(3,1fr);gap:10px;}
+.rw.open .rw-body{display:grid;}
+.rd{background:rgba(249,115,22,0.05);border:1px solid rgba(249,115,22,0.12);border-radius:10px;padding:12px 14px;}
+.rd-day{font-family:'DM Mono',monospace;font-size:8.5px;letter-spacing:2px;text-transform:uppercase;color:var(--run);margin-bottom:5px;}
+.rd-w{font-size:12px;font-weight:700;color:var(--bright);margin-bottom:3px;}
+.rd-n{font-size:11px;color:var(--dim);line-height:1.55;}
+
+/* FULL DAY TIMELINE */
+.fdays{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:40px;}
+.fd{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:16px 18px;}
+.fd-title{font-size:13px;font-weight:700;color:var(--bright);margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;}
+.fd-badge{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;padding:3px 8px;border-radius:3px;}
+.tl{display:grid;grid-template-columns:62px 1fr;gap:8px;margin-bottom:9px;}
+.tl:last-child{margin-bottom:0;}
+.tl-t{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);padding-top:1px;white-space:nowrap;}
+.tl-c{border-bottom:1px solid var(--border);padding-bottom:9px;}
+.tl:last-child .tl-c{border-bottom:none;padding-bottom:0;}
+.tl-n{font-size:11.5px;font-weight:600;color:var(--bright);}
+.tl-d{font-size:10.5px;color:var(--dim);margin-top:2px;line-height:1.5;}
+.dot-inline{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px;vertical-align:middle;}
+
+/* ── NUTRITION TAB ── */
+.meal-timeline{display:flex;flex-direction:column;gap:0;margin-bottom:40px;}
+.mc{display:grid;grid-template-columns:90px 1fr;gap:0;position:relative;}
+.mc:not(:last-child)::before{
+  content:'';position:absolute;left:44px;top:48px;bottom:-10px;
+  width:1px;background:linear-gradient(to bottom,var(--border),transparent);z-index:0;
+}
+.mc-time{
+  display:flex;flex-direction:column;align-items:center;
+  padding-top:14px;position:relative;z-index:1;
+}
+.mc-dot{
+  width:32px;height:32px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;flex-shrink:0;margin-bottom:5px;
+}
+.mc-tlabel{font-family:'DM Mono',monospace;font-size:8.5px;color:var(--muted);text-align:center;white-space:nowrap;line-height:1.4;}
+.mc-body{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:13px;padding:14px 18px;margin:8px 0 8px 10px;
+  transition:transform 0.18s,box-shadow 0.18s;
+}
+.mc-body:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,0.25);}
+.mc-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:9px;}
+.mc-name{font-size:14px;font-weight:700;color:var(--bright);font-family:'Instrument Serif',serif;}
+.mc-cal{font-size:9.5px;padding:3px 9px;border-radius:12px;font-weight:600;font-family:'DM Mono',monospace;letter-spacing:0.5px;white-space:nowrap;}
+.opts-label{font-family:'DM Mono',monospace;font-size:8.5px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:7px;}
+.opt{
+  display:flex;align-items:flex-start;gap:7px;padding:7px 10px;
+  border-radius:8px;margin-bottom:5px;font-size:12px;color:var(--text);
+  background:rgba(255,255,255,0.03);border:1px solid transparent;
+}
+.opt:last-child{margin-bottom:0;}
+.onum{
+  background:var(--border);color:var(--bright);
+  font-size:9px;font-weight:700;width:16px;height:16px;
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;margin-top:1px;font-family:'DM Mono',monospace;
+}
+.opt.single{background:rgba(106,170,122,0.07);border-color:rgba(106,170,122,0.15);}
+
+/* meal dot colours */
+.md-morning{background:linear-gradient(135deg,#6aaa7a,#4d8a5c);}
+.md-breakfast{background:linear-gradient(135deg,#fbbf24,#d97706);}
+.md-snack{background:linear-gradient(135deg,#34d399,#059669);}
+.md-lunch{background:linear-gradient(135deg,#f97316,#c2410c);}
+.md-dinner{background:linear-gradient(135deg,#3b82f6,#1d4ed8);}
+.md-water{background:linear-gradient(135deg,#38bdf8,#0284c7);}
+
+.cal-morning{background:rgba(106,170,122,0.12);color:var(--sage);}
+.cal-breakfast{background:rgba(251,191,36,0.12);color:var(--gym);}
+.cal-snack{background:rgba(52,211,153,0.12);color:var(--legs);}
+.cal-lunch{background:rgba(249,115,22,0.12);color:var(--run);}
+.cal-dinner{background:rgba(59,130,246,0.12);color:var(--push);}
+
+/* WATER GRID */
+.water-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:11px;margin-bottom:40px;}
+.wcard{
+  background:rgba(56,189,248,0.06);border:1px solid rgba(56,189,248,0.18);
+  border-radius:11px;padding:13px 15px;display:flex;align-items:center;gap:11px;
+}
+.wcard-ico{font-size:20px;flex-shrink:0;}
+.wcard-time{font-family:'DM Mono',monospace;font-size:9.5px;font-weight:600;color:var(--water);letter-spacing:1px;}
+.wcard-desc{font-size:11.5px;color:var(--text);margin-top:2px;line-height:1.5;}
+
+/* TIPS */
+.tips-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:11px;margin-bottom:40px;}
+.tip{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:15px 17px;}
+.tip-ico{font-size:20px;margin-bottom:8px;}
+.tip-t{font-weight:700;font-size:12px;color:var(--bright);margin-bottom:5px;}
+.tip-d{font-size:11.5px;color:var(--muted);line-height:1.6;}
+
+/* NUT TIMING PANEL */
+.nt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;margin-bottom:36px;}
+.nt{border-radius:10px;padding:13px 15px;}
+.nt-when{font-family:'DM Mono',monospace;font-size:8.5px;letter-spacing:2px;text-transform:uppercase;margin-bottom:5px;}
+.nt-what{font-size:12px;font-weight:600;color:var(--bright);margin-bottom:3px;}
+.nt-why{font-size:11px;color:var(--dim);line-height:1.55;}
+
+/* FOOTER */
+.footer{text-align:center;color:var(--muted);font-size:11.5px;padding:20px;border-top:1px solid var(--border);line-height:1.8;}
+
+@media(max-width:700px){
+  .wgrid{grid-template-columns:repeat(4,1fr);}
+  .ppl-grid{grid-template-columns:1fr;}
+  .fdays{grid-template-columns:1fr;}
+  .rw.open .rw-body{grid-template-columns:1fr 1fr;}
+  .rw-head{grid-template-columns:90px 1fr auto;}
+  .rw-dates{display:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-tab active" onclick="showTab('overview')">Overview</div>
+  <div class="nav-tab" onclick="showTab('training')">Training</div>
+  <div class="nav-tab" onclick="showTab('5k')">5K Plan</div>
+  <div class="nav-tab" onclick="showTab('nutrition')">Nutrition</div>
+  <div class="nav-tab" onclick="showTab('schedule')">Daily Schedule</div>
+</nav>
+
+<div class="wrap">
+
+<!-- ═══════════════════════════════════════════════════ OVERVIEW -->
+<div id="tab-overview" class="panel active">
+  <div class="hero">
+    <div class="eyebrow">Your Complete Health Plan · March 2026</div>
+    <h1>Train smart.<br><em>Run further.</em><br>Eat well.</h1>
+    <p class="hero-sub">1 session/day · PPL strength · 5K in 30–35 min · 1500 cal nutrition · Race day May 23</p>
+    <div class="hstats">
+      <div class="hs"><div class="hs-v">27 yrs</div><div class="hs-k">Age</div></div>
+      <div class="hs"><div class="hs-v">5'1"</div><div class="hs-k">Height</div></div>
+      <div class="hs"><div class="hs-v">64 kg</div><div class="hs-k">Weight</div></div>
+      <div class="hs"><div class="hs-v">~1500</div><div class="hs-k">Cal/Day</div></div>
+      <div class="hs"><div class="hs-v">30–35 min</div><div class="hs-k">5K Target</div></div>
+      <div class="hs"><div class="hs-v">May 23</div><div class="hs-k">Race Day</div></div>
+      <div class="hs"><div class="hs-v">11 weeks</div><div class="hs-k">To Race</div></div>
+    </div>
+  </div>
+
+  <div class="banner">
+    <div class="bico">⚡</div>
+    <div>
+      <h3>Your Plan at a Glance</h3>
+      <p>Your gym classes are excellent for fat loss, mobility and functional strength — but alone they won't build lean muscle or get you to a 30–35 min 5K. The solution: <strong>replace 3 gym class days with PPL strength sessions</strong> (Mon/Wed/Fri), keep your best cardio classes (Tue/Thu), use <strong>Saturday for your long run</strong>, and Sunday for gentle yoga recovery. <strong>Every day = exactly 1 session.</strong> Your 1500 cal nutrition plan is calibrated perfectly to fuel this — expect ~0.4 kg fat loss/week alongside muscle gain and running fitness.
+      <br><span class="btag">1 session/day</span><span class="btag">PPL 3×/week</span><span class="btag">Run 3×/week</span><span class="btag">1500 cal</span></p>
+    </div>
+  </div>
+
+  <div class="slabel">Weekly Structure</div>
+  <div class="sh2">7-Day Overview</div>
+  <p class="sdesc">One focused session every morning at 7 AM. No doubling up.</p>
+
+  <div class="legend">
+    <div class="leg"><div class="ldot" style="background:var(--run)"></div>Running</div>
+    <div class="leg"><div class="ldot" style="background:var(--push)"></div>Push (PPL)</div>
+    <div class="leg"><div class="ldot" style="background:var(--pull)"></div>Pull (PPL)</div>
+    <div class="leg"><div class="ldot" style="background:var(--legs)"></div>Legs (PPL)</div>
+    <div class="leg"><div class="ldot" style="background:var(--gym)"></div>Gym Class</div>
+    <div class="leg"><div class="ldot" style="background:var(--rest)"></div>Recovery</div>
+  </div>
+
+  <div class="wgrid">
+    <!-- SUN -->
+    <div class="dc c-rest">
+      <div class="dname">Sun</div>
+      <div class="dbadge">Recovery</div>
+      <div class="dtime">7:00 AM</div>
+      <div class="di"><div class="ddot"></div><span>Gentle Yoga class</span></div>
+      <div class="di"><div class="ddot"></div><span>Full rest day from intensity</span></div>
+      <div class="dtag">~50 min</div>
+    </div>
+    <!-- MON -->
+    <div class="dc c-push">
+      <div class="dname">Mon</div>
+      <div class="dbadge">Push Day</div>
+      <div class="dtime">7:00 AM</div>
+      <div class="di"><div class="ddot"></div><span>PPL Push session</span></div>
+      <div class="di"><div class="ddot"></div><span>Chest · Shoulders · Triceps</span></div>
+      <div class="di"><div class="ddot"></div><span>Replaces S&C class</span></div>
+      <div class="dtag">~45 min</div>
+    </div>
+    <!-- TUE -->
+    <div class="dc c-gym">
+      <div class="dname">Tue</div>
+      <div class="dbadge">Cardio</div>
+      <div class="dtime">7:00 AM</div>
+      <div class="di"><div class="ddot"></div><span>Vinyasa / KB Swings class</span></div>
+      <div class="di"><div class="ddot"></div><span>High-cardio, full body</span></div>
+      <div class="dtag">~60 min</div>
+    </div>
+    <!-- WED -->
+    <div class="dc c-pull">
+      <div class="dname">Wed</div>
+      <div class="dbadge">Pull Day</div>
+      <div class="dtime">7:00 AM</div>
+      <div class="di"><div class="ddot"></div><span>PPL Pull session</span></div>
+      <div class="di"><div class="ddot"></div><span>Back · Biceps · Rear Delts</span></div>
+      <div class="di"><div class="ddot"></div><span>Replaces Plyometrics class</span></div>
+      <div class="dtag">~45 min</div>
+    </div>
+    <!-- THU -->
+    <div class="dc c-run">
+      <div class="dname">Thu</div>
+      <div class="dbadge">Run Day</div>
+      <div class="dtime">7:00 AM</div>
+      <div class="di"><div class="ddot"></div><span>5K Training Run</span></div>
+      <div class="di"><div class="ddot"></div><span>Interval / Tempo (per phase)</span></div>
+      <div class="di"><div class="ddot"></div><span>Replaces Calisthenics</span></div>
+      <div class="dtag">~40 min</div>
+    </div>
+    <!-- FRI -->
+    <div class="dc c-legs">
+      <div class="dname">Fri</div>
+      <div class="dbadge">Legs Day</div>
+      <div class="dtime">7:00 AM</div>
+      <div class="di"><div class="ddot"></div><span>PPL Legs session</span></div>
+      <div class="di"><div class="ddot"></div><span>Squats · Deadlifts · Glutes</span></div>
+      <div class="di"><div class="ddot"></div><span>Replaces Mat Pilates</span></div>
+      <div class="dtag">~50 min</div>
+    </div>
+    <!-- SAT -->
+    <div class="dc c-run">
+      <div class="dname">Sat</div>
+      <div class="dbadge">Long Run</div>
+      <div class="dtime">7:00 AM</div>
+      <div class="di"><div class="ddot"></div><span>Weekly Long Run</span></div>
+      <div class="di"><div class="ddot"></div><span>Builds to full 5K distance</span></div>
+      <div class="dtag">~35–50 min</div>
+    </div>
+  </div>
+
+  <div class="banner" style="border-left-color:var(--legs);">
+    <div class="bico">💡</div>
+    <div>
+      <h3>Why replace those 3 classes?</h3>
+      <p>Monday's S&C, Wednesday's Plyometrics, and Friday's Pilates are all <strong>high-intensity, non-progressive</strong> sessions. PPL replaces them with <strong>structured progressive overload</strong> — the only way to build visible lean muscle and boost your resting metabolism. You keep Tue (KB/Vinyasa) as your cardio day and gain running sessions Thu & Sat. The result: more muscle, faster fat loss, and a 5K finish.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ TRAINING -->
+<div id="tab-training" class="panel">
+  <div style="padding-top:36px;"></div>
+  <div class="slabel">Strength Training</div>
+  <div class="sh2">PPL Split — 3 Days/Week</div>
+  <p class="sdesc">Monday = Push · Wednesday = Pull · Friday = Legs. 45–50 min each. 60 sec rest between sets. Add weight each week when you can complete all reps cleanly.</p>
+
+  <div class="ppl-grid">
+    <!-- PUSH -->
+    <div class="ppl-card">
+      <div class="ppl-head push-head">
+        <div><div class="ppl-big">P</div><div class="ppl-name">Push</div></div>
+        <div class="ppl-day" style="color:rgba(59,130,246,0.6)">Monday<br>7:00 AM</div>
+      </div>
+      <div class="ppl-body">
+        <div class="ex"><div><div class="ex-n">DB Shoulder Press</div><div class="ex-m">Front & mid delts</div></div><div class="ex-s push-s">3 × 10–12</div></div>
+        <div class="ex"><div><div class="ex-n">Incline DB Press</div><div class="ex-m">Upper chest</div></div><div class="ex-s push-s">3 × 10</div></div>
+        <div class="ex"><div><div class="ex-n">Lateral Raises</div><div class="ex-m">Side delts — toning</div></div><div class="ex-s push-s">3 × 15</div></div>
+        <div class="ex"><div><div class="ex-n">Push-Ups</div><div class="ex-m">Chest & triceps</div></div><div class="ex-s push-s">3 × 12</div></div>
+        <div class="ex"><div><div class="ex-n">Tricep Overhead Ext</div><div class="ex-m">Long head tricep</div></div><div class="ex-s push-s">3 × 12</div></div>
+        <div class="ex"><div><div class="ex-n">Cable / DB Chest Fly</div><div class="ex-m">Chest squeeze</div></div><div class="ex-s push-s">2 × 15</div></div>
+      </div>
+    </div>
+    <!-- PULL -->
+    <div class="ppl-card">
+      <div class="ppl-head pull-head">
+        <div><div class="ppl-big">P</div><div class="ppl-name">Pull</div></div>
+        <div class="ppl-day" style="color:rgba(167,139,250,0.6)">Wednesday<br>7:00 AM</div>
+      </div>
+      <div class="ppl-body">
+        <div class="ex"><div><div class="ex-n">Lat Pulldown</div><div class="ex-m">Lats, upper back</div></div><div class="ex-s pull-s">3 × 12</div></div>
+        <div class="ex"><div><div class="ex-n">Seated Cable Row</div><div class="ex-m">Mid back, rhomboids</div></div><div class="ex-s pull-s">3 × 12</div></div>
+        <div class="ex"><div><div class="ex-n">DB Bent-Over Row</div><div class="ex-m">Upper back, lats</div></div><div class="ex-s pull-s">3 × 10</div></div>
+        <div class="ex"><div><div class="ex-n">Face Pulls</div><div class="ex-m">Rear delts, posture</div></div><div class="ex-s pull-s">3 × 15</div></div>
+        <div class="ex"><div><div class="ex-n">DB Hammer Curl</div><div class="ex-m">Biceps, brachialis</div></div><div class="ex-s pull-s">3 × 12</div></div>
+        <div class="ex"><div><div class="ex-n">Assisted Pull-Up</div><div class="ex-m">Lats — goal: unassisted</div></div><div class="ex-s pull-s">2 × 8</div></div>
+      </div>
+    </div>
+    <!-- LEGS -->
+    <div class="ppl-card">
+      <div class="ppl-head legs-head">
+        <div><div class="ppl-big">L</div><div class="ppl-name">Legs</div></div>
+        <div class="ppl-day" style="color:rgba(52,211,153,0.6)">Friday<br>7:00 AM</div>
+      </div>
+      <div class="ppl-body">
+        <div class="ex"><div><div class="ex-n">Goblet Squat</div><div class="ex-m">Quads, glutes, core</div></div><div class="ex-s legs-s">4 × 12</div></div>
+        <div class="ex"><div><div class="ex-n">Romanian Deadlift</div><div class="ex-m">Hamstrings, glutes</div></div><div class="ex-s legs-s">3 × 10</div></div>
+        <div class="ex"><div><div class="ex-n">Walking Lunges</div><div class="ex-m">Quads, balance</div></div><div class="ex-s legs-s">3 × 12/leg</div></div>
+        <div class="ex"><div><div class="ex-n">Hip Thrust</div><div class="ex-m">Glutes — key for running</div></div><div class="ex-s legs-s">3 × 15</div></div>
+        <div class="ex"><div><div class="ex-n">Leg Press</div><div class="ex-m">Quad strength</div></div><div class="ex-s legs-s">3 × 12</div></div>
+        <div class="ex"><div><div class="ex-n">Standing Calf Raise</div><div class="ex-m">Calves — running power</div></div><div class="ex-s legs-s">4 × 20</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="slabel">Progression Guide</div>
+  <div class="sh2">How to Progress Each Week</div>
+  <p class="sdesc">Progressive overload is the key to results. Follow this simple rule:</p>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:36px;">
+    <div class="tip"><div class="tip-ico">📈</div><div class="tip-t">Add reps first</div><div class="tip-d">When you can complete all sets × reps with good form, add 2 reps before adding weight.</div></div>
+    <div class="tip"><div class="tip-ico">🏋️</div><div class="tip-t">Then add weight</div><div class="tip-d">Add 1–2 kg on upper body, 2–5 kg on lower body moves per week once reps are maxed.</div></div>
+    <div class="tip"><div class="tip-ico">📝</div><div class="tip-t">Track everything</div><div class="tip-d">Write weight & reps each session. You can't progress what you don't track.</div></div>
+    <div class="tip"><div class="tip-ico">😴</div><div class="tip-t">Muscle grows at rest</div><div class="tip-d">Sleep 7–8 hrs and eat your full 1500 cal — especially protein. Don't under-eat on training days.</div></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ 5K PLAN -->
+<div id="tab-5k" class="panel">
+  <div style="padding-top:36px;"></div>
+  <div class="slabel">5K Race Training</div>
+  <div class="sh2">11-Week Plan — Target: 30–35 min</div>
+  <p class="sdesc">Race Day: May 23, 2026 · Running days: Thursday (intervals/tempo) + Saturday (long run) · That's 2 runs/week to fit the 1 session/day rule. Tap each phase to expand.</p>
+
+  <div class="banner" style="border-left-color:var(--run);margin-bottom:22px;">
+    <div class="bico">🏃‍♀️</div>
+    <div>
+      <h3>Your Target Pace</h3>
+      <p>To run 5K in <strong>30–35 minutes</strong>, your goal pace is <strong>6:00–7:00 min/km</strong>. In training, your easy runs should feel like <strong>7:30–8:00 min/km</strong> (can talk in full sentences). Intervals and tempo runs push to <strong>5:45–6:15 min/km</strong>. By Week 8 you will run the full 5K distance. By Week 11, you'll race it at target pace.</p>
+    </div>
+  </div>
+
+  <div class="run-weeks">
+    <div class="rw open">
+      <div class="rw-head" onclick="this.parentElement.classList.toggle('open')">
+        <div class="rw-wk">Weeks 1–2</div>
+        <div class="rw-dates">Mar 9 – Mar 22</div>
+        <div class="rw-title">Base Building</div>
+        <div class="rw-badge">Easy Pace</div>
+        <div class="chevron">▼</div>
+      </div>
+      <div class="rw-body">
+        <div class="rd"><div class="rd-day">Thursday</div><div class="rd-w">Easy Run/Walk — 2 km</div><div class="rd-n">3 min run / 1 min walk. Repeat. Conversational pace. No pressure — just get moving.</div></div>
+        <div class="rd"><div class="rd-day">Saturday</div><div class="rd-w">Long Run — 2.5 km</div><div class="rd-n">Slowest run of the week. No walking. Focus on completing the distance and breathing.</div></div>
+        <div class="rd"><div class="rd-day">Pace Target</div><div class="rd-w">7:30–8:30 min/km</div><div class="rd-n">Don't race. These runs build your aerobic base — the foundation for your 30-min 5K.</div></div>
+      </div>
+    </div>
+
+    <div class="rw">
+      <div class="rw-head" onclick="this.parentElement.classList.toggle('open')">
+        <div class="rw-wk">Weeks 3–4</div>
+        <div class="rw-dates">Mar 23 – Apr 5</div>
+        <div class="rw-title">Volume Build</div>
+        <div class="rw-badge">Intervals Start</div>
+        <div class="chevron">▼</div>
+      </div>
+      <div class="rw-body">
+        <div class="rd"><div class="rd-day">Thursday</div><div class="rd-w">Intervals — 4 × 400m</div><div class="rd-n">Warm up 8 min jog. Then 400m at 6:00 min/km pace, 90 sec walk. Repeat 4×. Cool down.</div></div>
+        <div class="rd"><div class="rd-day">Saturday</div><div class="rd-w">Long Run — 3 km</div><div class="rd-n">Continuous run, no walking. Easy pace. Should finish feeling like you could do 500m more.</div></div>
+        <div class="rd"><div class="rd-day">Pace Target</div><div class="rd-w">7:00–7:30 min/km easy</div><div class="rd-n">6:00 min/km on interval reps. Your fitness is building — notice it getting easier.</div></div>
+      </div>
+    </div>
+
+    <div class="rw">
+      <div class="rw-head" onclick="this.parentElement.classList.toggle('open')">
+        <div class="rw-wk">Weeks 5–6</div>
+        <div class="rw-dates">Apr 6 – Apr 19</div>
+        <div class="rw-title">Tempo Work</div>
+        <div class="rw-badge">Speed + Endurance</div>
+        <div class="chevron">▼</div>
+      </div>
+      <div class="rw-body">
+        <div class="rd"><div class="rd-day">Thursday</div><div class="rd-w">Tempo Run — 2.5 km</div><div class="rd-n">After 8 min warm-up, run 2.5 km at 6:30 min/km (comfortably hard — 3–4 words only). Cool down 5 min.</div></div>
+        <div class="rd"><div class="rd-day">Saturday</div><div class="rd-w">Long Run — 4 km</div><div class="rd-n">Steady effort. Easy-to-moderate pace. This is a big confidence milestone — complete it.</div></div>
+        <div class="rd"><div class="rd-day">Pace Target</div><div class="rd-w">6:30 min/km tempo</div><div class="rd-n">If 4 km on Saturday feels manageable, you are right on track for 30–35 min finish.</div></div>
+      </div>
+    </div>
+
+    <div class="rw">
+      <div class="rw-head" onclick="this.parentElement.classList.toggle('open')">
+        <div class="rw-wk">Weeks 7–8</div>
+        <div class="rw-dates">Apr 20 – May 3</div>
+        <div class="rw-title">Peak Training</div>
+        <div class="rw-badge">First Full 5K</div>
+        <div class="chevron">▼</div>
+      </div>
+      <div class="rw-body">
+        <div class="rd"><div class="rd-day">Thursday</div><div class="rd-w">Intervals — 5 × 500m</div><div class="rd-n">At 5:45–6:00 min/km. 2 min walk rest. This builds the leg speed you need on race day.</div></div>
+        <div class="rd"><div class="rd-day">Saturday</div><div class="rd-w">🎯 First Full 5K</div><div class="rd-n">Run 5 km for the first time. Time yourself. Target: under 36 min. Don't sprint — run controlled.</div></div>
+        <div class="rd"><div class="rd-day">Pace Target</div><div class="rd-w">6:00–6:30 min/km</div><div class="rd-n">If your first 5K is under 36 min, your race target of 30–35 min is very achievable with 3 more weeks.</div></div>
+      </div>
+    </div>
+
+    <div class="rw">
+      <div class="rw-head" onclick="this.parentElement.classList.toggle('open')">
+        <div class="rw-wk">Weeks 9–10</div>
+        <div class="rw-dates">May 4 – May 17</div>
+        <div class="rw-title">Race Sharpening</div>
+        <div class="rw-badge">Tune-Up</div>
+        <div class="chevron">▼</div>
+      </div>
+      <div class="rw-body">
+        <div class="rd"><div class="rd-day">Thursday</div><div class="rd-w">Race Pace Intervals — 3 × 1 km</div><div class="rd-n">Run at exactly your target race pace (6:00–7:00/km). 2 min rest. This is a dress rehearsal.</div></div>
+        <div class="rd"><div class="rd-day">Saturday</div><div class="rd-w">Practice 5K — timed</div><div class="rd-n">Full 5K at target pace. Goal: 30–35 min. If you hit it here, race day is a formality.</div></div>
+        <div class="rd"><div class="rd-day">Pace Target</div><div class="rd-w">6:00–7:00 min/km</div><div class="rd-n">Race pace throughout. Stay even — don't go out too fast in the first km.</div></div>
+      </div>
+    </div>
+
+    <div class="rw">
+      <div class="rw-head" onclick="this.parentElement.classList.toggle('open')">
+        <div class="rw-wk">Week 11</div>
+        <div class="rw-dates">May 18 – May 23</div>
+        <div class="rw-title">Race Week — Taper</div>
+        <div class="rw-badge">🏁 Race Day</div>
+        <div class="chevron">▼</div>
+      </div>
+      <div class="rw-body">
+        <div class="rd"><div class="rd-day">Monday or Tuesday</div><div class="rd-w">Easy shake-out — 2 km</div><div class="rd-n">Very slow. Just loosen up the legs. No effort. This is not a training run.</div></div>
+        <div class="rd"><div class="rd-day">Wed–Fri</div><div class="rd-w">Complete Rest</div><div class="rd-n">No gym, no running. Sleep 8+ hrs. Eat your full calories. Drink 2.5 L water daily.</div></div>
+        <div class="rd"><div class="rd-day">Saturday May 23 🏁</div><div class="rd-w">RACE DAY — 5K</div><div class="rd-n">Eat light breakfast 90 min before. Warm up 8–10 min. First km SLOW. Finish strong. You've earned this.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="slabel">Race Day Tips</div>
+  <div class="tips-grid">
+    <div class="tip"><div class="tip-ico">🍌</div><div class="tip-t">Pre-race meal</div><div class="tip-d">Banana + 2 dates or brown bread + egg, 90 min before. Not too much — just enough fuel.</div></div>
+    <div class="tip"><div class="tip-ico">💧</div><div class="tip-t">Hydration</div><div class="tip-d">500 ml water the morning of. Sip, don't chug. Stop drinking 20 min before the start.</div></div>
+    <div class="tip"><div class="tip-ico">🐢</div><div class="tip-t">Start slow</div><div class="tip-d">Your first km should feel almost too easy. Most people blow up at km 1. Don't be that person.</div></div>
+    <div class="tip"><div class="tip-ico">🎧</div><div class="tip-t">Use a playlist</div><div class="tip-d">Music at 160–170 BPM matches a good running cadence and naturally lifts your pace.</div></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ NUTRITION -->
+<div id="tab-nutrition" class="panel">
+  <div style="padding-top:36px;"></div>
+  <div class="slabel">Nutrition Plan</div>
+  <div class="sh2">1500 Calorie Daily Plan</div>
+  <p class="sdesc">Nutritionist-prescribed · High protein · Balanced macros · Sustainable weight loss</p>
+
+  <div class="banner" style="border-left-color:var(--sage);margin-bottom:30px;">
+    <div class="bico">💚</div>
+    <div>
+      <h3>Why this plan works for you</h3>
+      <p>At 27, 5'1", 64 kg your maintenance calories are ~1,750–1,900 kcal/day. This 1,500 cal plan creates a safe <strong>300–400 cal daily deficit</strong> — enough for ~0.4 kg fat loss per week without starvation or muscle loss. The plan is <strong>high in protein</strong> (paneer, eggs, fish, chicken, sprouts) to preserve muscle while you're training hard for your 5K. Combined with your gym sessions, expect visible body composition changes within 4–6 weeks.</p>
+    </div>
+  </div>
+
+  <div class="slabel">Meal Timetable</div>
+  <div class="sh2">What to Eat & When</div>
+  <p class="sdesc">Tap each card to view all food options for that meal.</p>
+
+  <div class="meal-timeline">
+
+    <!-- MORNING -->
+    <div class="mc">
+      <div class="mc-time">
+        <div class="mc-dot md-morning">🌿</div>
+        <div class="mc-tlabel">6:30<br>AM</div>
+      </div>
+      <div class="mc-body">
+        <div class="mc-header">
+          <div class="mc-name">Morning Ritual</div>
+          <div class="mc-cal cal-morning">~10 kcal</div>
+        </div>
+        <div class="opts-label">Every single day — non-negotiable</div>
+        <div class="opt single"><span>☕</span><span>1 cup <strong>green tea</strong> (unsweetened) + <strong>5g flaxseeds</strong> soaked overnight in 2 tbsp water</span></div>
+        <div class="opt single" style="background:rgba(56,189,248,0.06);border-color:rgba(56,189,248,0.15);margin-top:8px;font-size:11px;color:var(--dim);">
+          <span>💧</span><span>Before the green tea: drink <strong>1–2 glasses warm water</strong> on empty stomach first</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- BREAKFAST -->
+    <div class="mc">
+      <div class="mc-time">
+        <div class="mc-dot md-breakfast">🍳</div>
+        <div class="mc-tlabel">8:00<br>AM</div>
+      </div>
+      <div class="mc-body">
+        <div class="mc-header">
+          <div class="mc-name">Breakfast</div>
+          <div class="mc-cal cal-breakfast">~320–360 kcal</div>
+        </div>
+        <div class="opts-label">Choose one option — rotate daily</div>
+        <div class="opt"><div class="onum">A</div><span><strong>2 scrambled eggs</strong> (1 tsp olive oil) + <strong>1 slice brown bread</strong> + <strong>50g avocado</strong> — add lemon & chilli flakes</span></div>
+        <div class="opt"><div class="onum">B</div><span><strong>50g rolled oats</strong> in <strong>100ml low-fat milk or dahi</strong> + <strong>5g mixed nuts</strong> (almonds + walnuts) + cinnamon</span></div>
+        <div class="opt"><div class="onum">C</div><span><strong>Bonus:</strong> Moong dal chilla (50g moong batter) + 100g dahi + veggies stuffed inside</span></div>
+        <div class="opt"><div class="onum">D</div><span><strong>Bonus:</strong> 2 oats idli + sambar + mint-coriander chutney</span></div>
+      </div>
+    </div>
+
+    <!-- SNACK 1 -->
+    <div class="mc">
+      <div class="mc-time">
+        <div class="mc-dot md-snack">🌰</div>
+        <div class="mc-tlabel">11:00<br>AM</div>
+      </div>
+      <div class="mc-body">
+        <div class="mc-header">
+          <div class="mc-name">Mid-Morning Snack</div>
+          <div class="mc-cal cal-snack">~50–80 kcal</div>
+        </div>
+        <div class="opts-label">Choose one option</div>
+        <div class="opt"><div class="onum">A</div><span><strong>20g makhana</strong> (fox nuts) — dry roast with rock salt & jeera</span></div>
+        <div class="opt"><div class="onum">B</div><span><strong>1 cup fresh coconut water</strong> — no sugar added, great for electrolytes</span></div>
+        <div class="opt"><div class="onum">C</div><span><strong>1 small apple</strong> — or 1 small pear / guava / 10 strawberries</span></div>
+        <div class="opt"><div class="onum">D</div><span><strong>Bonus:</strong> 1 small orange + 4 almonds</span></div>
+      </div>
+    </div>
+
+    <!-- LUNCH -->
+    <div class="mc">
+      <div class="mc-time">
+        <div class="mc-dot md-lunch">🥘</div>
+        <div class="mc-tlabel">1:00<br>PM</div>
+      </div>
+      <div class="mc-body">
+        <div class="mc-header">
+          <div class="mc-name">Lunch</div>
+          <div class="mc-cal cal-lunch">~450–500 kcal</div>
+        </div>
+        <div class="opts-label">Fixed base + choose a variation</div>
+        <div class="opt single"><span>🫓</span><span><strong>2 whole wheat rotis</strong> (30g each, unrefined atta) + <strong>150g mixed green veggies</strong> (palak/broccoli/beans/zucchini) + <strong>100g paneer</strong></span></div>
+        <div class="opt"><div class="onum">A</div><span><strong>Paneer bhurji</strong> — scrambled with onion, tomato, cumin, coriander</span></div>
+        <div class="opt"><div class="onum">B</div><span><strong>Paneer tikka</strong> — grilled, no oil, with mint chutney</span></div>
+        <div class="opt"><div class="onum">C</div><span><strong>Swap paneer</strong> for 100g tofu or 1 cup rajma/chana (once or twice a week)</span></div>
+        <div class="opt"><div class="onum">D</div><span>Add a small <strong>bowl of raita</strong> (100g dahi + cucumber + cumin) for gut health</span></div>
+      </div>
+    </div>
+
+    <!-- SNACK 2 -->
+    <div class="mc">
+      <div class="mc-time">
+        <div class="mc-dot md-snack">🥚</div>
+        <div class="mc-tlabel">4:00<br>PM</div>
+      </div>
+      <div class="mc-body">
+        <div class="mc-header">
+          <div class="mc-name">Evening Snack</div>
+          <div class="mc-cal cal-snack">~70–100 kcal</div>
+        </div>
+        <div class="opts-label">Choose one — eat 1.5 hrs before any run</div>
+        <div class="opt"><div class="onum">A</div><span><strong>1 boiled egg</strong> — salt, pepper, chaat masala. High protein, easy to digest.</span></div>
+        <div class="opt"><div class="onum">B</div><span><strong>50g sprouts salad</strong> — moong/chana sprouts + diced tomato, onion, lemon, coriander</span></div>
+        <div class="opt"><div class="onum">C</div><span><strong>Bonus:</strong> 100g low-fat dahi + sprinkle of flaxseeds</span></div>
+        <div class="opt"><div class="onum">D</div><span><strong>Bonus:</strong> 1 cup green tea + 4 walnuts (omega-3 for recovery)</span></div>
+      </div>
+    </div>
+
+    <!-- DINNER -->
+    <div class="mc">
+      <div class="mc-time">
+        <div class="mc-dot md-dinner">🍽️</div>
+        <div class="mc-tlabel">7:00<br>PM</div>
+      </div>
+      <div class="mc-body">
+        <div class="mc-header">
+          <div class="mc-name">Dinner</div>
+          <div class="mc-cal" style="background:var(--push-d);color:var(--push);">~400–450 kcal</div>
+        </div>
+        <div class="opts-label">Choose protein + carb combo — eat before 8 PM</div>
+        <div class="opt"><div class="onum">A</div><span><strong>150g grilled/baked fish</strong> (rohu, surmai, salmon) + <strong>100g brown rice</strong> + <strong>150g sautéed mushrooms</strong></span></div>
+        <div class="opt"><div class="onum">B</div><span><strong>150g chicken breast</strong> (tandoori/grilled, no skin) + <strong>1 whole wheat roti</strong> + <strong>150g mushroom sabzi</strong></span></div>
+        <div class="opt"><div class="onum">C</div><span><strong>150g tofu</strong> (garlic + low-sodium soy, pan-grilled) + <strong>100g brown rice</strong> + <strong>spinach & mushroom stir-fry</strong></span></div>
+        <div class="opt"><div class="onum">D</div><span><strong>Bonus:</strong> 2 boiled egg curry + 1 roti + salad — good variety on lighter days</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- WATER SECTION -->
+  <div class="slabel" style="margin-top:20px;">Water Intake</div>
+  <div class="sh2">Daily Hydration Schedule</div>
+  <p class="sdesc">Target: 2.0–2.5 litres/day. On run days, aim for 2.5 L minimum.</p>
+
+  <div class="water-grid">
+    <div class="wcard"><div class="wcard-ico">🌅</div><div><div class="wcard-time">6:00 AM</div><div class="wcard-desc">2 glasses warm water — first thing, empty stomach</div></div></div>
+    <div class="wcard"><div class="wcard-ico">☕</div><div><div class="wcard-time">6:30 AM</div><div class="wcard-desc">Green tea counts (~200 ml fluid)</div></div></div>
+    <div class="wcard"><div class="wcard-ico">🥗</div><div><div class="wcard-time">8:45 AM</div><div class="wcard-desc">1 glass after breakfast (wait 30 min)</div></div></div>
+    <div class="wcard"><div class="wcard-ico">🕙</div><div><div class="wcard-time">10:30 AM</div><div class="wcard-desc">1–2 glasses or herbal tea (jeera/tulsi/cinnamon)</div></div></div>
+    <div class="wcard"><div class="wcard-ico">🥘</div><div><div class="wcard-time">12:30 PM</div><div class="wcard-desc">1 glass, 30 min before lunch — reduces appetite</div></div></div>
+    <div class="wcard"><div class="wcard-ico">☀️</div><div><div class="wcard-time">3:00 PM</div><div class="wcard-desc">2 glasses — afternoon hydration peak</div></div></div>
+    <div class="wcard"><div class="wcard-ico">🌤️</div><div><div class="wcard-time">5:30 PM</div><div class="wcard-desc">1–2 glasses / jeera water</div></div></div>
+    <div class="wcard"><div class="wcard-ico">🌙</div><div><div class="wcard-time">7:45 PM</div><div class="wcard-desc">1 glass after dinner (wait 30–45 min)</div></div></div>
+  </div>
+  <p style="font-size:11.5px;color:var(--muted);text-align:center;margin-top:10px;">On run days add: 500 ml before the run + 250–300 ml during if over 30 min · Avoid ice-cold water · Don't gulp large amounts right before or after meals</p>
+
+  <!-- NUTRITION TIPS -->
+  <div class="slabel" style="margin-top:32px;">Key Nutrition Rules</div>
+  <div class="tips-grid">
+    <div class="tip"><div class="tip-ico">🕐</div><div class="tip-t">Eat on time</div><div class="tip-d">Keep meal gaps to 3–4 hours. Skipping meals slows metabolism and increases cravings.</div></div>
+    <div class="tip"><div class="tip-ico">🧂</div><div class="tip-t">Cut hidden calories</div><div class="tip-d">No ghee, butter, sugar, fried foods, packaged juices. Max 2 tsp cooking oil/day (mustard or olive).</div></div>
+    <div class="tip"><div class="tip-ico">🍳</div><div class="tip-t">Cook smart</div><div class="tip-d">Grill, steam, sauté. Deep-frying doubles the calories. Air frying is fine as an alternative.</div></div>
+    <div class="tip"><div class="tip-ico">📊</div><div class="tip-t">Weigh weekly</div><div class="tip-d">Weight fluctuates ±1–2 kg daily (water, hormones). Weigh every Saturday morning, same time.</div></div>
+    <div class="tip"><div class="tip-ico">💪</div><div class="tip-t">Protein is non-negotiable</div><div class="tip-d">On training days, prioritise eggs, paneer, chicken, fish or tofu at every main meal.</div></div>
+    <div class="tip"><div class="tip-ico">🏃‍♀️</div><div class="tip-t">Fuel your run</div><div class="tip-d">On Thursday & Saturday run days, have snack 2 (egg or sprouts) 1.5 hrs before. Never run fully fasted for long runs.</div></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ DAILY SCHEDULE -->
+<div id="tab-schedule" class="panel">
+  <div style="padding-top:36px;"></div>
+  <div class="slabel">Hour by Hour</div>
+  <div class="sh2">Full Daily Schedule</div>
+  <p class="sdesc">Every day mapped out — training, meals, hydration and recovery.</p>
+
+  <div class="fdays">
+
+    <!-- SUNDAY -->
+    <div class="fd">
+      <div class="fd-title">Sunday <span class="fd-badge" style="background:var(--rest-d);color:var(--rest);">Gentle Yoga · Recovery</span></div>
+      <div class="tl"><div class="tl-t">6:00 AM</div><div class="tl-c"><div class="tl-n">Warm water (2 glasses)</div><div class="tl-d">Empty stomach, before anything else</div></div></div>
+      <div class="tl"><div class="tl-t">6:30 AM</div><div class="tl-c"><div class="tl-n">Green tea + flaxseeds</div><div class="tl-d">Morning ritual every day</div></div></div>
+      <div class="tl"><div class="tl-t">7:00 AM</div><div class="tl-c"><div class="tl-n"><span class="dot-inline" style="background:var(--rest)"></span>Gentle Yoga Class (~50 min)</div><div class="tl-d">Focus on stretching, breathing, mental reset</div></div></div>
+      <div class="tl"><div class="tl-t">8:00 AM</div><div class="tl-c"><div class="tl-n">Breakfast</div><div class="tl-d">Option A or B — no rush today</div></div></div>
+      <div class="tl"><div class="tl-t">1:00 PM</div><div class="tl-c"><div class="tl-n">Lunch</div><div class="tl-d">Roti + paneer + sabzi</div></div></div>
+      <div class="tl"><div class="tl-t">4:00 PM</div><div class="tl-c"><div class="tl-n">Snack 2 + light walk</div><div class="tl-d">10–15 min easy walk helps digestion</div></div></div>
+      <div class="tl"><div class="tl-t">7:00 PM</div><div class="tl-c"><div class="tl-n">Dinner (before 8 PM)</div><div class="tl-d">Fish/chicken/tofu + rice or roti</div></div></div>
+    </div>
+
+    <!-- MONDAY -->
+    <div class="fd">
+      <div class="fd-title">Monday <span class="fd-badge" style="background:var(--push-d);color:var(--push);">PPL — Push</span></div>
+      <div class="tl"><div class="tl-t">6:00 AM</div><div class="tl-c"><div class="tl-n">Warm water (2 glasses)</div><div class="tl-d">Empty stomach</div></div></div>
+      <div class="tl"><div class="tl-t">6:30 AM</div><div class="tl-c"><div class="tl-n">Green tea + flaxseeds</div><div class="tl-d">Light pre-session ritual</div></div></div>
+      <div class="tl"><div class="tl-t">7:00 AM</div><div class="tl-c"><div class="tl-n"><span class="dot-inline" style="background:var(--push)"></span>PPL Push Session (~45 min)</div><div class="tl-d">Chest · Shoulders · Triceps — 5 min warm-up + lifts + 5 min stretch</div></div></div>
+      <div class="tl"><div class="tl-t">8:00 AM</div><div class="tl-c"><div class="tl-n">Post-workout Breakfast</div><div class="tl-d">Within 45 min — eggs + brown bread is ideal. Don't skip!</div></div></div>
+      <div class="tl"><div class="tl-t">11:00 AM</div><div class="tl-c"><div class="tl-n">Snack 1</div><div class="tl-d">Makhana / apple / coconut water</div></div></div>
+      <div class="tl"><div class="tl-t">1:00 PM</div><div class="tl-c"><div class="tl-n">Lunch</div><div class="tl-d">Full meal — roti + paneer + sabzi</div></div></div>
+      <div class="tl"><div class="tl-t">4:00 PM</div><div class="tl-c"><div class="tl-n">Snack 2</div><div class="tl-d">Boiled egg or sprouts</div></div></div>
+      <div class="tl"><div class="tl-t">7:00 PM</div><div class="tl-c"><div class="tl-n">Dinner (before 8 PM)</div><div class="tl-d">High protein — chicken/fish/tofu</div></div></div>
+    </div>
+
+    <!-- TUESDAY -->
+    <div class="fd">
+      <div class="fd-title">Tuesday <span class="fd-badge" style="background:var(--gym-d);color:var(--gym);">Vinyasa / KB Swings</span></div>
+      <div class="tl"><div class="tl-t">6:00 AM</div><div class="tl-c"><div class="tl-n">Warm water + green tea</div><div class="tl-d">Hydrate before class — have a banana if KB class is very intense</div></div></div>
+      <div class="tl"><div class="tl-t">7:00 AM</div><div class="tl-c"><div class="tl-n"><span class="dot-inline" style="background:var(--gym)"></span>Vinyasa Flow / KB Swings (~60 min)</div><div class="tl-d">Full cardio + mobility session — push hard here</div></div></div>
+      <div class="tl"><div class="tl-t">8:15 AM</div><div class="tl-c"><div class="tl-n">Post-class Breakfast</div><div class="tl-d">Within 45 min of class. Oats + nuts works great after cardio.</div></div></div>
+      <div class="tl"><div class="tl-t">11:00 AM</div><div class="tl-c"><div class="tl-n">Snack 1</div><div class="tl-d">Coconut water great on active days for electrolytes</div></div></div>
+      <div class="tl"><div class="tl-t">1:00 PM</div><div class="tl-c"><div class="tl-n">Lunch</div><div class="tl-d">Roti + paneer + sabzi — full meal, no skipping</div></div></div>
+      <div class="tl"><div class="tl-t">4:00 PM</div><div class="tl-c"><div class="tl-n">Snack 2 + rest</div><div class="tl-d">No evening run today — rest and recover</div></div></div>
+      <div class="tl"><div class="tl-t">7:00 PM</div><div class="tl-c"><div class="tl-n">Dinner (before 8 PM)</div><div class="tl-d">Fish or chicken — protein to rebuild from KB session</div></div></div>
+    </div>
+
+    <!-- WEDNESDAY -->
+    <div class="fd">
+      <div class="fd-title">Wednesday <span class="fd-badge" style="background:var(--pull-d);color:var(--pull);">PPL — Pull</span></div>
+      <div class="tl"><div class="tl-t">6:00 AM</div><div class="tl-c"><div class="tl-n">Warm water + green tea</div><div class="tl-d">Morning ritual</div></div></div>
+      <div class="tl"><div class="tl-t">7:00 AM</div><div class="tl-c"><div class="tl-n"><span class="dot-inline" style="background:var(--pull)"></span>PPL Pull Session (~45 min)</div><div class="tl-d">Back · Biceps · Rear Delts — great for posture and running form</div></div></div>
+      <div class="tl"><div class="tl-t">8:00 AM</div><div class="tl-c"><div class="tl-n">Post-workout Breakfast</div><div class="tl-d">Eggs + brown bread — protein priority after back day</div></div></div>
+      <div class="tl"><div class="tl-t">11:00 AM</div><div class="tl-c"><div class="tl-n">Snack 1</div><div class="tl-d">Makhana or apple</div></div></div>
+      <div class="tl"><div class="tl-t">1:00 PM</div><div class="tl-c"><div class="tl-n">Lunch</div><div class="tl-d">Full meal — can add raita on Wednesday for gut health</div></div></div>
+      <div class="tl"><div class="tl-t">4:00 PM</div><div class="tl-c"><div class="tl-n">Snack 2</div><div class="tl-d">Sprouts salad — great recovery food</div></div></div>
+      <div class="tl"><div class="tl-t">7:00 PM</div><div class="tl-c"><div class="tl-n">Dinner (before 8 PM)</div><div class="tl-d">Brown rice + protein — good carb night for Thursday's run</div></div></div>
+    </div>
+
+    <!-- THURSDAY -->
+    <div class="fd">
+      <div class="fd-title">Thursday <span class="fd-badge" style="background:var(--run-d);color:var(--run);">5K Training Run</span></div>
+      <div class="tl"><div class="tl-t">6:00 AM</div><div class="tl-c"><div class="tl-n">Warm water + green tea</div><div class="tl-d">No heavy food before — just tea + flaxseeds</div></div></div>
+      <div class="tl"><div class="tl-t">7:00 AM</div><div class="tl-c"><div class="tl-n"><span class="dot-inline" style="background:var(--run)"></span>5K Training Run (~35–45 min)</div><div class="tl-d">Interval or tempo run per weekly plan. Warm up 8 min + main session + cool down 5 min.</div></div></div>
+      <div class="tl"><div class="tl-t">8:00 AM</div><div class="tl-c"><div class="tl-n">Post-run Breakfast</div><div class="tl-d">Most important breakfast of the week. Eggs + bread OR oats + milk. Eat within 45 min.</div></div></div>
+      <div class="tl"><div class="tl-t">11:00 AM</div><div class="tl-c"><div class="tl-n">Snack 1</div><div class="tl-d">Coconut water — replenish electrolytes lost in run</div></div></div>
+      <div class="tl"><div class="tl-t">1:00 PM</div><div class="tl-c"><div class="tl-n">Lunch</div><div class="tl-d">Full meal — roti + paneer + green sabzi</div></div></div>
+      <div class="tl"><div class="tl-t">4:00 PM</div><div class="tl-c"><div class="tl-n">Snack 2 + foam roll</div><div class="tl-d">Roll out calves, hamstrings, quads (10 min) — prevents injury</div></div></div>
+      <div class="tl"><div class="tl-t">7:00 PM</div><div class="tl-c"><div class="tl-n">Dinner (before 8 PM)</div><div class="tl-d">High protein — fish or chicken, runner's recovery meal</div></div></div>
+    </div>
+
+    <!-- FRIDAY -->
+    <div class="fd">
+      <div class="fd-title">Friday <span class="fd-badge" style="background:var(--legs-d);color:var(--legs);">PPL — Legs</span></div>
+      <div class="tl"><div class="tl-t">6:00 AM</div><div class="tl-c"><div class="tl-n">Warm water + green tea</div><div class="tl-d">Leg day needs fuel — consider a banana pre-session</div></div></div>
+      <div class="tl"><div class="tl-t">7:00 AM</div><div class="tl-c"><div class="tl-n"><span class="dot-inline" style="background:var(--legs)"></span>PPL Legs Session (~50 min)</div><div class="tl-d">Squats · RDL · Hip Thrusts · Lunges · Calf raises. 5 min warm-up essential.</div></div></div>
+      <div class="tl"><div class="tl-t">8:00 AM</div><div class="tl-c"><div class="tl-n">Post-workout Breakfast</div><div class="tl-d">Oats + milk + nuts — carb + protein after heavy leg session</div></div></div>
+      <div class="tl"><div class="tl-t">11:00 AM</div><div class="tl-c"><div class="tl-n">Snack 1</div><div class="tl-d">Makhana — light and easy on digestion</div></div></div>
+      <div class="tl"><div class="tl-t">1:00 PM</div><div class="tl-c"><div class="tl-n">Lunch</div><div class="tl-d">Roti + paneer + sabzi — big meal, legs need carbs</div></div></div>
+      <div class="tl"><div class="tl-t">4:00 PM</div><div class="tl-c"><div class="tl-n">Snack 2 + foam roll legs</div><div class="tl-d">Roll out quads and calves to prep for Saturday long run</div></div></div>
+      <div class="tl"><div class="tl-t">7:00 PM</div><div class="tl-c"><div class="tl-n">Dinner + stretch (before 8 PM)</div><div class="tl-d">Brown rice + tofu/fish. Stretch hamstrings 10 min after dinner for Saturday.</div></div></div>
+    </div>
+
+    <!-- SATURDAY -->
+    <div class="fd">
+      <div class="fd-title">Saturday <span class="fd-badge" style="background:var(--run-d);color:var(--run);">Long Run Day 🏁</span></div>
+      <div class="tl"><div class="tl-t">6:00 AM</div><div class="tl-c"><div class="tl-n">Warm water (500 ml) + banana</div><div class="tl-d">More hydration before long run — banana gives quick carbs</div></div></div>
+      <div class="tl"><div class="tl-t">6:30 AM</div><div class="tl-c"><div class="tl-n">Green tea + flaxseeds</div><div class="tl-d">Last thing before heading out</div></div></div>
+      <div class="tl"><div class="tl-t">7:00 AM</div><div class="tl-c"><div class="tl-n"><span class="dot-inline" style="background:var(--run)"></span>Long Run (builds 2.5 → 5 km)</div><div class="tl-d">Slowest run of the week. Conversational pace. This is where your endurance is built.</div></div></div>
+      <div class="tl"><div class="tl-t">8:00 AM</div><div class="tl-c"><div class="tl-n">Biggest Breakfast of the Week</div><div class="tl-d">Eggs + avocado + brown bread OR oats + milk + nuts + banana. Treat yourself!</div></div></div>
+      <div class="tl"><div class="tl-t">11:00 AM</div><div class="tl-c"><div class="tl-n">Snack 1</div><div class="tl-d">Apple or coconut water — keep refuelling</div></div></div>
+      <div class="tl"><div class="tl-t">1:00 PM</div><div class="tl-c"><div class="tl-n">Lunch</div><div class="tl-d">Full meal — you've earned it. Rajma/chana swap is great on Saturdays.</div></div></div>
+      <div class="tl"><div class="tl-t">PM</div><div class="tl-c"><div class="tl-n">Active recovery — no more training</div><div class="tl-d">Foam roll · Light stretching · Epsom salt bath if sore · Sleep 8+ hrs tonight</div></div></div>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    ⚠️ Always warm up 5–8 min before strength sessions. Cool down + stretch after every run.<br>
+    Muscle soreness in weeks 1–3 is normal — push through. Sharp joint pain is not — rest and get advice.<br>
+    With consistency, expect visible changes in body composition and running fitness by week 4–5. 💪
+  </div>
+</div>
+
+</div><!-- end wrap -->
+
+<script>
+function showTab(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  event.target.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+document.querySelectorAll('.rw').forEach((w,i) => {
+  if (i > 0) w.classList.remove('open');
+});
+</script>
+</body>
+</html>
